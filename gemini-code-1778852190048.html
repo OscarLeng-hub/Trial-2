@@ -1,0 +1,304 @@
+<!DOCTYPE html>
+<html lang="zh-HK">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>CS2 歐皇神話至尊盲盒 - 演示版</title>
+    <style>
+        :root {
+            --primary: #ff4e50;
+            --dark-bg: #0b0c10;
+            --card-bg: #14161d;
+            --border-color: #222530;
+            --gold: #fbc02d;
+            --red: #eb4b4b;
+            --pink: #d32ce6;
+            --purple: #8847ff;
+            --blue: #4b69ff;
+        }
+
+        body {
+            font-family: 'PingFang HK', 'Microsoft JhengHei', sans-serif;
+            background-color: var(--dark-bg);
+            color: #ffffff;
+            margin: 0; padding: 0;
+            display: flex; flex-direction: column; align-items: center;
+            min-height: 100vh; overflow-x: hidden;
+        }
+
+        header {
+            width: 100%; background-color: #07080b; padding: 15px 0;
+            border-bottom: 2px solid var(--border-color);
+            display: flex; justify-content: space-around; align-items: center;
+        }
+
+        .logo {
+            font-size: 22px; font-weight: 900;
+            background: linear-gradient(135deg, var(--primary), var(--gold));
+            -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+        }
+
+        .balance {
+            background-color: rgba(251, 192, 45, 0.1);
+            border: 1px solid var(--gold);
+            padding: 6px 15px; border-radius: 20px;
+            color: var(--gold); font-weight: bold;
+        }
+
+        .container { max-width: 900px; width: 95%; margin: 20px auto; }
+
+        /* 滾輪樣式 */
+        .machine-box {
+            background-color: var(--card-bg); border: 1px solid var(--border-color);
+            border-radius: 12px; padding: 20px; text-align: center; margin-bottom: 25px;
+        }
+
+        .roulette-viewport {
+            width: 100%; height: 140px; background: #07080a;
+            border: 2px solid #2d313d; border-radius: 4px;
+            position: relative; overflow: hidden; margin: 20px 0;
+        }
+
+        .pointer {
+            position: absolute; left: 50%; top: 0; width: 2px; height: 100%;
+            background-color: var(--gold); z-index: 10; transform: translateX(-50%);
+            box-shadow: 0 0 10px var(--gold);
+        }
+
+        .roulette-track { display: flex; position: absolute; left: 0; top: 15px; height: 110px; }
+
+        .skin-card {
+            width: 120px; height: 110px; background: rgba(30, 33, 41, 0.4);
+            margin: 0 2px; flex-shrink: 0; border-bottom: 5px solid #888;
+            display: flex; flex-direction: column; align-items: center;
+            justify-content: space-between; padding: 10px 5px; box-sizing: border-box;
+        }
+
+        .skin-card img { width: 80px; height: 55px; object-fit: contain; }
+        .skin-name { font-size: 10px; color: #ced4da; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; width: 100%; }
+
+        /* 稀有度顏色 */
+        .rarity-gold { border-bottom-color: var(--gold); }
+        .rarity-red { border-bottom-color: var(--red); }
+        .rarity-pink { border-bottom-color: var(--pink); }
+        .rarity-purple { border-bottom-color: var(--purple); }
+        .rarity-blue { border-bottom-color: var(--blue); }
+
+        .btn {
+            background: linear-gradient(135deg, var(--primary), #d9383a);
+            border: none; color: white; padding: 10px 25px;
+            font-weight: bold; border-radius: 8px; cursor: pointer;
+        }
+        .btn:disabled { opacity: 0.5; cursor: not-allowed; }
+
+        .inventory-grid {
+            display: grid; grid-template-columns: repeat(auto-fill, minmax(110px, 1fr));
+            gap: 10px; margin-top: 15px;
+        }
+        .inv-item {
+            background-color: #0f1015; border: 1px solid var(--border-color);
+            border-radius: 8px; padding: 10px; text-align: center;
+        }
+        .inv-item img { width: 60px; }
+
+        /* 彈窗 */
+        .fullscreen-modal {
+            display: none; position: fixed; top: 0; left: 0; width: 100vw; height: 100vh;
+            background: rgba(0,0,0,0.95); z-index: 10000;
+            flex-direction: column; justify-content: center; align-items: center;
+        }
+    </style>
+</head>
+<body>
+
+    <header>
+        <div class="logo">CS2 歐皇神話至尊盲盒</div>
+        <div class="balance" id="balance-val">1000 金幣</div>
+    </header>
+
+    <div class="container">
+        <div class="machine-box">
+            <h2>官方同款：命運開箱機</h2>
+            <p style="color: #888;">每抽 12 次必得紫色 | 50 次必得粉色 | 150 次必得紅色</p>
+            
+            <div class="roulette-viewport" id="viewport">
+                <div class="pointer"></div>
+                <div class="roulette-track" id="track"></div>
+            </div>
+
+            <div style="margin-bottom: 15px;">
+                <label style="cursor:pointer; color:#ccc; font-size:14px;">
+                    <input type="checkbox" id="skip-anim"> 跳過動畫
+                </label>
+            </div>
+
+            <button class="btn" id="spin-btn" onclick="handleSpin()">立即開箱 (10金幣)</button>
+        </div>
+
+        <div class="machine-box" style="text-align: left;">
+            <h3>🎒 我的背包</h3>
+            <div class="inventory-grid" id="inventory-grid"></div>
+        </div>
+    </div>
+
+    <div class="fullscreen-modal" id="reward-modal">
+        <h1 style="color:var(--gold)">恭喜獲得！</h1>
+        <div id="reward-display"></div>
+        <button class="btn" onclick="closeModal()" style="margin-top:20px">收下</button>
+    </div>
+
+    <script>
+        // 數據定義
+        const ITEMS = {
+            blue: [
+                { name: "Glock-18 | 賈米森", img: "https://community.cloudflare.steamstatic.com/economy/image/-9a81dlWLwJ2UUGcVs_nsVwgdKYehLQyeUhY_IA_O3hld18rMld_kW4ieYxdKz8bPDbYgKqN-g-r5t1WSv2U8vqn38fdVkt_LAtosreYJAJu7PzHeDNL69SxlI6Fm_X3O-OFkT9XvZEpju_E9Niz3lfsrkM9MTynd9SdeAY8M1DYr1O6xOzoisS7tIO78Q", rarity: "rarity-blue" },
+                { name: "MP9 | 微光", img: "https://community.cloudflare.steamstatic.com/economy/image/-9a81dlWLwJ2UUGcVs_nsVwgdKYehLQyeUhY_IA_O3hld18rMld_kW4ieYxdKz8bPDbYgKqN-g-r5t1WSv2U8vqn38fdVkt_LAtosreYJAJu7PzHeDNL69SxlI6Fm_X3O-OFkT9XvZEpju_E9Niz3lfsrkM9MTynd9SdeAY8M1DYr1O6xOzoisS7tIO78Q", rarity: "rarity-blue" }
+            ],
+            purple: [
+                { name: "USP-S | 網絡捕手", img: "https://community.cloudflare.steamstatic.com/economy/image/-9a81dlWLwJ2UUGcVs_nsVwgdKYehLQyeUhY_IA_O3hld18rMld_kW4ieYxdKz8bPDbYgKqN-g-r5t1WSv2U8vqn38fdVkt_LAtosreYJAJu7PzHeDNL69SxlI6Fm_X3O-OFkT9XvZEpju_E9Niz3lfsrkM9MTynd9SdeAY8M1DYr1O6xOzoisS7tIO78Q", rarity: "rarity-purple" }
+            ],
+            pink: [
+                { name: "AK-47 | 霓虹革命", img: "https://community.cloudflare.steamstatic.com/economy/image/-9a81dlWLwJ2UUGcVs_nsVwgdKYehLQyeUhY_IA_O3hld18rMld_kW4ieYxdKz8bPDbYgKqN-g-r8t1WSv3W8fyn38fdVEJu4LeYJAZv7PzHfS9N69SjlI6Fm_X3P-OFkT9XvZEpju_E9Nig2VfsrUU9MTynd9SdeAY8M1DYr1Prw7q8jMTitIO3pA", rarity: "rarity-pink" }
+            ],
+            red: [
+                { name: "AWP | 巨龍傳說", img: "https://community.cloudflare.steamstatic.com/economy/image/-9a81dlWLwJ2UUGcVs_nsVwgdKYehLQyeUhY_IA_O3hld18rMld_kW4ieYxdKz8bPDbYgKqN-g-r2t1WSv3R8fKx38fdX01_Ignv4beYJAJu7PzHeDNL4t-klY6FkvX3b_WGlT9XvZEpju_E92g2VfsrkE9MTrnd9SdeAY8NFDYr1K_ye_mjsS7tIOvsw", rarity: "rarity-red" }
+            ],
+            gold: [
+                { name: "★ 爪子刀 | 傳說", img: "https://community.cloudflare.steamstatic.com/economy/image/-9a81dlWLwJ2UUGcVs_nsVwgdKYehLQyeUhY_IA_O3hld18rMld_kW4ieYxdKz8bPDbYgKqN-g-r805WSv_S-Oun38fdV1t_LQZosreYJAhv7PvHfDxL69mkkY6FlvX3Z6-FkT9XvZEpju_E9Nym0VkrRE-Yzund9SdewY7Ml_U_wTo28S4S8Sj_A", rarity: "rarity-gold" }
+            ]
+        };
+
+        // 狀態管理
+        let balance = 1000;
+        let inventory = [];
+        let p_count = 0; // 紫色計數
+        let pk_count = 0; // 粉色計數
+        let r_count = 0; // 紅色計數
+
+        // 視覺：純 RNG 產生背景格子（包含黃色，讓畫面好看）
+        function getRandomVisualItem() {
+            const r = Math.random() * 100;
+            if (r < 2) return ITEMS.gold[0];
+            if (r < 7) return ITEMS.red[0];
+            if (r < 15) return ITEMS.pink[0];
+            if (r < 35) return ITEMS.purple[0];
+            return ITEMS.blue[Math.floor(Math.random() * ITEMS.blue.length)];
+        }
+
+        // 後台：保底判定邏輯 (不含黃色)
+        function getWinningItem() {
+            p_count++; pk_count++; r_count++;
+            
+            // 優先判定紅色保底 (150)
+            if (r_count >= 150) {
+                r_count = 0; pk_count = 0; p_count = 0;
+                return ITEMS.red[0];
+            }
+            // 判定粉色保底 (50)
+            if (pk_count >= 50) {
+                pk_count = 0; p_count = 0;
+                return ITEMS.pink[0];
+            }
+            // 判定紫色保底 (12)
+            if (p_count >= 12) {
+                p_count = 0;
+                return ITEMS.purple[0];
+            }
+            // 正常隨機 (極低機率出好貨，絕不扣除黃色)
+            const roll = Math.random() * 1000;
+            if (roll < 1) return ITEMS.red[0];
+            if (roll < 5) return ITEMS.pink[0];
+            if (roll < 20) return ITEMS.purple[0];
+            return ITEMS.blue[Math.floor(Math.random() * ITEMS.blue.length)];
+        }
+
+        function handleSpin() {
+            if (balance < 10) return alert("餘額不足");
+            balance -= 10;
+            document.getElementById('balance-val').innerText = balance + " 金幣";
+
+            const winItem = getWinningItem();
+            const isSkip = document.getElementById('skip-anim').checked;
+
+            if (isSkip) {
+                finalizeSpin(winItem);
+            } else {
+                runAnimation(winItem);
+            }
+        }
+
+        function runAnimation(winItem) {
+            const track = document.getElementById('track');
+            const btn = document.getElementById('spin-btn');
+            btn.disabled = true;
+            track.innerHTML = '';
+            track.style.transition = 'none';
+            track.style.transform = 'translateX(0px)';
+
+            const winIndex = 60; // 停在第 60 格
+            
+            // 🎯 視覺機制：每一格都由 RNG 產生，保證不同
+            for(let i=0; i<70; i++) {
+                const item = (i === winIndex) ? winItem : getRandomVisualItem();
+                const card = document.createElement('div');
+                card.className = `skin-card ${item.rarity}`;
+                card.innerHTML = `<img src="${item.img}"><div class="skin-name">${item.name}</div>`;
+                track.appendChild(card);
+            }
+
+            setTimeout(() => {
+                const cardWidth = 124;
+                const offset = -(winIndex * cardWidth) + (document.getElementById('viewport').offsetWidth / 2) - (cardWidth / 2);
+                track.style.transition = 'transform 6s cubic-bezier(0.1, 0, 0.1, 1)';
+                track.style.transform = `translateX(${offset}px)`;
+            }, 50);
+
+            setTimeout(() => {
+                finalizeSpin(winItem);
+                btn.disabled = false;
+            }, 6500);
+        }
+
+        function finalizeSpin(item) {
+            inventory.unshift(item);
+            renderInventory();
+            showModal(item);
+        }
+
+        function renderInventory() {
+            const grid = document.getElementById('inventory-grid');
+            grid.innerHTML = inventory.map(item => `
+                <div class="inv-item">
+                    <img src="${item.img}">
+                    <div style="font-size:10px">${item.name}</div>
+                </div>
+            `).join('');
+        }
+
+        function showModal(item) {
+            const modal = document.getElementById('reward-modal');
+            const display = document.getElementById('reward-display');
+            display.innerHTML = `
+                <div class="skin-card ${item.rarity}" style="width:200px; height:200px; background:#1a1c24">
+                    <img src="${item.img}" style="width:150px">
+                    <p>${item.name}</p>
+                </div>
+            `;
+            modal.style.display = 'flex';
+        }
+
+        function closeModal() {
+            document.getElementById('reward-modal').style.display = 'none';
+        }
+
+        // 初始化一些背景格子
+        for(let i=0; i<10; i++) {
+            const item = getRandomVisualItem();
+            const card = document.createElement('div');
+            card.className = `skin-card ${item.rarity}`;
+            card.innerHTML = `<img src="${item.img}"><div class="skin-name">${item.name}</div>`;
+            document.getElementById('track').appendChild(card);
+        }
+    </script>
+</body>
+</html>
