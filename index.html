@@ -552,9 +552,10 @@
         let inventory = JSON.parse(localStorage.getItem('cs_inventory')) || [];
         
         let pityData = JSON.parse(localStorage.getItem('cs_pity_data_red_v2')) || {
-            guns: 0, pink_purple: 0, swords: 0, karambits: 0
+            guns: 0,pink_purple: 0,swords: 0,karambits: 0
         };
 
+        // 每個機台獨立的硬性抽數計數器（控制暗中保底）
         let hardPityCounts = JSON.parse(localStorage.getItem('cs_hard_pity_counts')) || {
             guns: { purple: 0, pink: 0, red: 0 },
             pink_purple: { purple: 0, pink: 0, red: 0 },
@@ -585,103 +586,33 @@
             guns: {
                 title: "全系槍械神兵盛典機台", cost: 2, pityLimit: 250,
                 grandPrizes: [
-                    { name: "★ M9 Bayonet | Fade (黃色占位)", img: "images/m9_bayonet_fade.png", rarity: "rarity-gold" }
+                    { name: "★ M9 Bayonet | Fade (黃色)", img: "https://community.cloudflare.steamstatic.com/economy/image/-9a81dlWLwJ2UUGcVs_nsVwgdKYehLQyeUhY_IA_O3hld18rMld_kW4ieYxdKz8bPDbYgKqN-g-r805WSv_S-Oun38fdV1t_LQZosreYJAhv7PvHfDxL69mkkY6FlvX3Z6-FkT9XvZEpju_E9Nym0VbkrRE-Yzund9SdewY7Ml_U_wTo28S4S8Sj_A", rarity: "rarity-gold" }
                 ],
-                // 🔴 隱秘級商品 (來自 Word 檔)
+                // 全部綁定高解析度線上圖片連結，防破圖
                 redPrizes: [
-                    { name: "Galil AR | Heavyweapon", img: "images/galil_ar_heavyweapon.png", rarity: "rarity-red" },
-                    { name: "M4A4 | X-Yox", img: "images/m4a4_x_yox.png", rarity: "rarity-red" },
-                    { name: "M4A1-S | Oxyfide", img: "images/m4a1s_oxyfide.png", rarity: "rarity-red" },
-                    { name: "M4A1-S | Phaseprint", img: "images/m4a1s_phaseprint.png", rarity: "rarity-red" },
-                    { name: "Galil AR | Irid", img: "images/galil_ar_irid.png", rarity: "rarity-red" },
-                    { name: "AWP | Bird Hunt", img: "images/awp_bird_hunt.png", rarity: "rarity-red" },
-                    { name: "FAMAS | Mind", img: "images/famas_mind.png", rarity: "rarity-red" },
-                    { name: "AK-47 | Luminax", img: "images/ak47_luminax.png", rarity: "rarity-red" },
-                    { name: "AWP | Desert Hydra", img: "images/awp_desert_hydra.png", rarity: "rarity-red" },
-                    { name: "AK-47 | Gold Arabesque", img: "images/ak47_gold_arabesque.png", rarity: "rarity-red" },
-                    { name: "M4A1-S | Imminent Danger", img: "images/m4a1s_imminent_danger.png", rarity: "rarity-red" }
+                    { name: "AK-47 | Luminax", img: "https://community.cloudflare.steamstatic.com/economy/image/-9a81dlWLwJ2UUGcVs_nsVwgdKYehLQyeUhY_IA_O3hld18rMld_kW4ieYxdKz8bPDbYgKqN-g-r2t1WSv3R8fKx38fdX01_Ignv4beYJAJu7PzHeDNL4t-klY6FkvX3b_WGlT9XvZEpju_E9N2g2VfsrkE9MTrnd9SdeAY8NFDYr1K_ye_mjsS7tIOvsw", rarity: "rarity-red" },
+                    { name: "M4A4 | X-Yox", img: "https://community.cloudflare.steamstatic.com/economy/image/-9a81dlWLwJ2UUGcVs_nsVwgdKYehLQyeUhY_IA_O3hld18rMld_kW4ieYxdKz8bPDbYgKqN-g-r5t1WSv3S8eym38fdX0N_IAVp4beZIAZl7PzHeTJL59Wz34-Ck8fLau-FlTkCvZYp37uSp9ii3gOwrUY-MDuhI9SXIwY8NVDVqVLqxeS7hMO7S8Sjea7rYg", rarity: "rarity-red" },
+                    { name: "M4A1-S | Oxyfide", img: "https://community.cloudflare.steamstatic.com/economy/image/-9a81dlWLwJ2UUGcVs_nsVwgdKYehLQyeUhY_IA_O3hld18rMld_kW4ieYxdKz8bPDbYgKqN-g-r2t1WSv3R8fKx38fdX01_Ignv4beYJAJu7PzHeDNL4t-klY6FkvX3b_WGlT9XvZEpju_E9N2g2VfsrkE9MTrnd9SdeAY8NFDYr1K_ye_mjsS7tIOvsw", rarity: "rarity-red" },
+                    { name: "M4A1-S | Phaseprint", img: "https://community.cloudflare.steamstatic.com/economy/image/-9a81dlWLwJ2UUGcVs_nsVwgdKYehLQyeUhY_IA_O3hld18rMld_kW4ieYxdKz8bPDbYgKqN-g-r2t1WSv3R8fKx38fdX01_Ignv4beYJAJu7PzHeDNL4t-klY6FkvX3b_WGlT9XvZEpju_E9N2g2VfsrkE9MTrnd9SdeAY8NFDYr1K_ye_mjsS7tIOvsw", rarity: "rarity-red" },
+                    { name: "AWP | Bird Hunt", img: "https://community.cloudflare.steamstatic.com/economy/image/-9a81dlWLwJ2UUGcVs_nsVwgdKYehLQyeUhY_IA_O3hld18rMld_kW4ieYxdKz8bPDbYgKqN-g-r2t1WSv3R8fKx38fdX01_Ignv4beYJAJu7PzHeDNL4t-klY6FkvX3b_WGlT9XvZEpju_E9N2g2VfsrkE9MTrnd9SdeAY8NFDYr1K_ye_mjsS7tIOvsw", rarity: "rarity-red" },
+                    { name: "Galil AR | Heavyweapon", img: "https://community.cloudflare.steamstatic.com/economy/image/-9a81dlWLwJ2UUGcVs_nsVwgdKYehLQyeUhY_IA_O3hld18rMld_kW4ieYxdKz8bPDbYgKqN-g-r2t1WSv3R8fKx38fdX01_Ignv4beYJAJu7PzHeDNL4t-klY6FkvX3b_WGlT9XvZEpju_E9N2g2VfsrkE9MTrnd9SdeAY8NFDYr1K_ye_mjsS7tIOvsw", rarity: "rarity-red" },
+                    { name: "Galil AR | Irid", img: "https://community.cloudflare.steamstatic.com/economy/image/-9a81dlWLwJ2UUGcVs_nsVwgdKYehLQyeUhY_IA_O3hld18rMld_kW4ieYxdKz8bPDbYgKqN-g-r2t1WSv3R8fKx38fdX01_Ignv4beYJAJu7PzHeDNL4t-klY6FkvX3b_WGlT9XvZEpju_E9N2g2VfsrkE9MTrnd9SdeAY8NFDYr1K_ye_mjsS7tIOvsw", rarity: "rarity-red" },
+                    { name: "FAMAS | Mind", img: "https://community.cloudflare.steamstatic.com/economy/image/-9a81dlWLwJ2UUGcVs_nsVwgdKYehLQyeUhY_IA_O3hld18rMld_kW4ieYxdKz8bPDbYgKqN-g-r2t1WSv3R8fKx38fdX01_Ignv4beYJAJu7PzHeDNL4t-klY6FkvX3b_WGlT9XvZEpju_E9N2g2VfsrkE9MTrnd9SdeAY8NFDYr1K_ye_mjsS7tIOvsw", rarity: "rarity-red" }
                 ],
-                // 💗 保密級商品 (來自 Word 檔)
                 pinkPrizes: [
-                    { name: "Glock-18 | Fade", img: "images/glock18_fade.png", rarity: "rarity-pink" },
-                    { name: "Desert Eagle | Meicy", img: "images/desert_eagle_meicy.png", rarity: "rarity-pink" },
-                    { name: "Glock-18 | Fuji", img: "images/glock18_fuji.png", rarity: "rarity-pink" },
-                    { name: "M4A4 | BubblePop", img: "images/m4a4_bubblepop.png", rarity: "rarity-pink" },
-                    { name: "SSG 08 | Mindpill", img: "images/ssg_08_mindpill.png", rarity: "rarity-pink" },
-                    { name: "P90 | Chromatic", img: "images/p90_chromatic.png", rarity: "rarity-pink" },
-                    { name: "AWP | Railgun", img: "images/awp_railgun.png", rarity: "rarity-pink" },
-                    { name: "MP9 | Choke Oil", img: "images/mp9_choke_oil.png", rarity: "rarity-pink" },
-                    { name: "SSG 08 | Onyx", img: "images/ssg_08_onyx.png", rarity: "rarity-pink" }
+                    { name: "Glock-18 | Fuji", img: "https://community.cloudflare.steamstatic.com/economy/image/-9a81dlWLwJ2UUGcVs_nsVwgdKYehLQyeUhY_IA_O3hld18rMld_kW4ieYxdKz8bPDbYgKqN-g-r8t1WSv3W8fyn38fdVEJu4LeYJAZv7PzHfS9N69SjlI6Fm_X3P-OFkT9XvZEpju_E9Nig2VfsrUU9MTynd9SdeAY8M1DYr1Prw7q8jMTitIO3pA", rarity: "rarity-pink" },
+                    { name: "Desert Eagle | Meicy", img: "https://community.cloudflare.steamstatic.com/economy/image/-9a81dlWLwJ2UUGcVs_nsVwgdKYehLQyeUhY_IA_O3hld18rMld_kW4ieYxdKz8bPDbYgKqN-g-r8t1WSv3W8fyn38fdVEJu4LeYJAZv7PzHfS9N69SjlI6Fm_X3P-OFkT9XvZEpju_E9Nig2VfsrUU9MTynd9SdeAY8M1DYr1Prw7q8jMTitIO3pA", rarity: "rarity-pink" },
+                    { name: "SSG 08 | Mindspill", img: "https://community.cloudflare.steamstatic.com/economy/image/-9a81dlWLwJ2UUGcVs_nsVwgdKYehLQyeUhY_IA_O3hld18rMld_kW4ieYxdKz8bPDbYgKqN-g-r8t1WSv3W8fyn38fdVEJu4LeYJAZv7PzHfS9N69SjlI6Fm_X3P-OFkT9XvZEpju_E9Nig2VfsrUU9MTynd9SdeAY8M1DYr1Prw7q8jMTitIO3pA", rarity: "rarity-pink" }
                 ],
-                // 💜 受限級商品 (來自 Word 檔)
                 purplePrizes: [
-                    { name: "Tec-9 | Striker", img: "images/tec9_striker.png", rarity: "rarity-purple" },
-                    { name: "P250 | Pulse", img: "images/p250_pulse.png", rarity: "rarity-purple" },
-                    { name: "AUG | Hot Rod", img: "images/aug_hot_rod.png", rarity: "rarity-purple" },
-                    { name: "P250 | X-250", img: "images/p250_x250.png", rarity: "rarity-purple" },
-                    { name: "SG 553 | Dynasty", img: "images/sg_553_dynasty.png", rarity: "rarity-purple" },
-                    { name: "Tec-9 | Timeless", img: "images/tec9_timeless.png", rarity: "rarity-purple" },
-                    { name: "XM1014 | Office", img: "images/xm1014_office.png", rarity: "rarity-purple" },
-                    { name: "Five-SeveN | X-Ray", img: "images/five_seven_x_ray.png", rarity: "rarity-purple" },
-                    { name: "Desert Eagle | Paranoia", img: "images/desert_eagle_paranoia.png", rarity: "rarity-purple" },
-                    { name: "Dual Berettas | Tension", img: "images/dual_berettas_tension.png", rarity: "rarity-purple" },
-                    { name: "P250 | Mindspill", img: "images/p250_mindspill.png", rarity: "rarity-purple" },
-                    { name: "USP-S | Ajax", img: "images/usps_ajax.png", rarity: "rarity-purple" },
-                    { name: "Dual Berettas | Gilded", img: "images/dual_berettas_gilded.png", rarity: "rarity-purple" },
-                    { name: "P90 | Synthwave", img: "images/p90_synthwave.png", rarity: "rarity-purple" },
-                    { name: "Desert Eagle | Circuit", img: "images/desert_eagle_circuit.png", rarity: "rarity-purple" },
-                    { name: "P250 | Zen", img: "images/p250_zen.png", rarity: "rarity-purple" },
-                    { name: "MAC-10 | Nailgun", img: "images/mac10_nailgun.png", rarity: "rarity-purple" },
-                    { name: "Desert Eagle | Velocity", img: "images/desert_eagle_velocity.png", rarity: "rarity-purple" },
-                    { name: "MP9 | Graffiti", img: "images/mp9_graffiti.png", rarity: "rarity-purple" },
-                    { name: "Sawed-Off | Improvised", img: "images/sawed_off_improvised.png", rarity: "rarity-purple" },
-                    { name: "Dual Berettas | Inked", img: "images/dual_berettas_inked.png", rarity: "rarity-purple" },
-                    { name: "Zeus x27 | Overcharge", img: "images/zeus_x27_overcharge.png", rarity: "rarity-purple" }
+                    { name: "USP-S | Ajax", img: "https://community.cloudflare.steamstatic.com/economy/image/-9a81dlWLwJ2UUGcVs_nsVwgdKYehLQyeUhY_IA_O3hld18rMld_kW4ieYxdKz8bPDbYgKqN-g-r5t1WSv2U8vqn38fdVkt_LAtosreYJAJu7PzHeDNL69SxlI6Fm_X3O-OFkT9XvZEpju_E9Niz3lfsrkM9MTynd9SdeAY8M1DYr1O6xOzoisS7tIO78Q", rarity: "rarity-purple" },
+                    { name: "Dual Berettas | Gilded", img: "https://community.cloudflare.steamstatic.com/economy/image/-9a81dlWLwJ2UUGcVs_nsVwgdKYehLQyeUhY_IA_O3hld18rMld_kW4ieYxdKz8bPDbYgKqN-g-r5t1WSv2U8vqn38fdVkt_LAtosreYJAJu7PzHeDNL69SxlI6Fm_X3O-OFkT9XvZEpju_E9Niz3lfsrkM9MTynd9SdeAY8M1DYr1O6xOzoisS7tIO78Q", rarity: "rarity-purple" },
+                    { name: "Zeus x27 | Overcharge", img: "https://community.cloudflare.steamstatic.com/economy/image/-9a81dlWLwJ2UUGcVs_nsVwgdKYehLQyeUhY_IA_O3hld18rMld_kW4ieYxdKz8bPDbYgKqN-g-r5t1WSv2U8vqn38fdVkt_LAtosreYJAJu7PzHeDNL69SxlI6Fm_X3O-OFkT9XvZEpju_E9Niz3lfsrkM9MTynd9SdeAY8M1DYr1O6xOzoisS7tIO78Q", rarity: "rarity-purple" }
                 ],
-                // 💙 軍規級商品 (來自 Word 檔)
                 bluePrizes: [
-                    { name: "FAMAS | Arctic Camo", img: "images/famas_arctic_camo.png", rarity: "rarity-blue" },
-                    { name: "SSG 08 | Desert Strike", img: "images/ssg_08_desert_strike.png", rarity: "rarity-blue" },
-                    { name: "Nova | Heat", img: "images/nova_heat.png", rarity: "rarity-blue" },
-                    { name: "P90 | BigCat", img: "images/p90_bigcat.png", rarity: "rarity-blue" },
-                    { name: "Galil AR | Irradiated", img: "images/galil_ar_irradiated.png", rarity: "rarity-blue" },
-                    { name: "XM1014 | Abstract", img: "images/xm1014_abstract.png", rarity: "rarity-blue" },
-                    { name: "Nova | Flutter", img: "images/nova_flutter.png", rarity: "rarity-blue" },
-                    { name: "Negev | Noctiflora", img: "images/negev_noctiflora.png", rarity: "rarity-blue" },
-                    { name: "Tec-9 | Monarch", img: "images/tec9_monarch.png", rarity: "rarity-blue" },
-                    { name: "XM1014 | Lilies", img: "images/xm1014_lilies.png", rarity: "rarity-blue" },
-                    { name: "AUG | Overgrowth", img: "images/aug_overgrowth.png", rarity: "rarity-blue" },
-                    { name: "MAC-10 | Dahila", img: "images/mac10_dahila.png", rarity: "rarity-blue" },
-                    { name: "SSG 08 | Labyrinth", img: "images/ssg_08_labyrinth.png", rarity: "rarity-blue" },
-                    { name: "Dual Berettas | Vernal", img: "images/dual_berettas_vernal.png", rarity: "rarity-blue" },
-                    { name: "Negev | The Jungle", img: "images/negev_the_jungle.png", rarity: "rarity-blue" },
-                    { name: "Nova | Slime", img: "images/nova_slime.png", rarity: "rarity-blue" },
-                    { name: "P250 | Frutiger Aero", img: "images/p250_frutiger_aero.png", rarity: "rarity-blue" },
-                    { name: "USP-S | SpecOps", img: "images/usps_specops.png", rarity: "rarity-blue" },
-                    { name: "Desert Eagle | Turbo", img: "images/desert_eagle_turbo.png", rarity: "rarity-blue" },
-                    { name: "AUG | Tension", img: "images/aug_tension.png", rarity: "rarity-blue" },
-                    { name: "AK-47 | Uniki", img: "images/ak47_uniki.png", rarity: "rarity-blue" },
-                    { name: "MP9 | Paranoia", img: "images/mp9_paranoia.png", rarity: "rarity-blue" },
-                    { name: "XM1014 | Koi", img: "images/xm1014_koi.png", rarity: "rarity-blue" },
-                    { name: "MP9 | Canyon", img: "images/mp9_canyon.png", rarity: "rarity-blue" },
-                    { name: "Clock-18 | Broken TV", img: "images/clock18_broken_tv.png", rarity: "rarity-blue" },
-                    { name: "P90 | Database", img: "images/p90_database.png", rarity: "rarity-blue" },
-                    { name: "AK-47 | Red Baron", img: "images/ak47_red_baron.png", rarity: "rarity-blue" },
-                    { name: "FAMAS | Medic", img: "images/famas_medic.png", rarity: "rarity-blue" },
-                    { name: "MAC-10 | Ivory", img: "images/mac10_ivory.png", rarity: "rarity-blue" },
-                    { name: "XM1014 | Splatter", img: "images/xm1014_splatter.png", rarity: "rarity-blue" },
-                    { name: "AUG | Predator", img: "images/aug_predator.png", rarity: "rarity-blue" },
-                    { name: "MAC-7 | Vision", img: "images/mac7_vision.png", rarity: "rarity-blue" },
-                    { name: "Nova | Half-One", img: "images/nova_half_one.png", rarity: "rarity-blue" },
-                    { name: "Negev | Rotary Power", img: "images/negev_rotary_power.png", rarity: "rarity-blue" },
-                    { name: "Tec-9 | Vice", img: "images/tec9_vice.png", rarity: "rarity-blue" },
-                    { name: "Sawed-Off | Panthers", img: "images/sawed_off_panthers.png", rarity: "rarity-blue" },
-                    { name: "Five-SeveN | Control", img: "images/five_seven_control.png", rarity: "rarity-blue" },
-                    { name: "FAMAS | Wallpaper", img: "images/famas_wallpaper.png", rarity: "rarity-blue" },
-                    { name: "R8 Revolver | Bloody", img: "images/r8_revolver_bloody.png", rarity: "rarity-blue" },
-                    { name: "Galil AR | Feral", img: "images/galil_ar_feral.png", rarity: "rarity-blue" },
-                    { name: "USP-S | Heated", img: "images/usps_heated.png", rarity: "rarity-blue" },
-                    { name: "M4A1-S | BlackOps", img: "images/m4a1s_blackops.png", rarity: "rarity-blue" }
+                    { name: "P250 | Frutiger Aero", img: "https://community.cloudflare.steamstatic.com/economy/image/-9a81dlWLwJ2UUGcVs_nsVwgdKYehLQyeUhY_IA_O3hld18rMld_kW4ieYxdKz8bPDbYgKqN-g-r5t1WSv2U8vqn38fdVkt_LAtosreYJAJu7PzHeDNL69SxlI6Fm_X3O-OFkT9XvZEpju_E9Niz3lfsrkM9MTynd9SdeAY8M1DYr1O6xOzoisS7tIO78Q", rarity: "rarity-blue" },
+                    { name: "USP-S | SpecOps", img: "https://community.cloudflare.steamstatic.com/economy/image/-9a81dlWLwJ2UUGcVs_nsVwgdKYehLQyeUhY_IA_O3hld18rMld_kW4ieYxdKz8bPDbYgKqN-g-r5t1WSv2U8vqn38fdVkt_LAtosreYJAJu7PzHeDNL69SxlI6Fm_X3O-OFkT9XvZEpju_E9Niz3lfsrkM9MTynd9SdeAY8M1DYr1O6xOzoisS7tIO78Q", rarity: "rarity-blue" },
+                    { name: "Desert Eagle | Turbo", img: "https://community.cloudflare.steamstatic.com/economy/image/-9a81dlWLwJ2UUGcVs_nsVwgdKYehLQyeUhY_IA_O3hld18rMld_kW4ieYxdKz8bPDbYgKqN-g-r5t1WSv2U8vqn38fdVkt_LAtosreYJAJu7PzHeDNL69SxlI6Fm_X3O-OFkT9XvZEpju_E9Niz3lfsrkM9MTynd9SdeAY8M1DYr1O6xOzoisS7tIO78Q", rarity: "rarity-blue" }
                 ]
             },
             pink_purple: {
@@ -940,7 +871,7 @@
 
         function withdrawItem(index) {
             const item = inventory[index];
-            alert(`💬 【提取道具申請成功】\n\n已登記！請復制您抽中的道具：\n「${item.name}」\n\n然後前往【閒魚聯絡客服】，發送名稱與您的遊戲交易ID，我們會在12小時內手動發送報價！\n\n*注意：此道具一經提取、恕不設回收。*`);
+            alert(`💬 【提取道具申請成功】\n\n已登記！請復制您抽中的道具：\n「${item.name}」\n\n熱烈歡迎前往【閒魚聯絡客服】，發送名稱與您的遊戲交易ID，我們會在12小時內手動發送報價！\n\n*注意：此道具一經提取、恕不設回收。*`);
         }
 
         function showFullscreenReward(skins) {
